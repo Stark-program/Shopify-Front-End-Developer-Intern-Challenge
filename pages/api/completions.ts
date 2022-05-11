@@ -6,14 +6,10 @@ import axios from 'axios'
 
 let openAi_secret_key = process.env.OPENAI_SECRET_KEY
 
-type Data = {
-  name: string
-  key: string
-}
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse
 ) {
   console.log(req.body)
   let config = {

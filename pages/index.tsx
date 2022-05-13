@@ -18,9 +18,6 @@ const Home: NextPage = () => {
     let inputValue = e.target[0].value
     let data = {
       prompt: inputValue,
-      max_tokens: 64,
-      top_p: 1.0,
-      temperature: 0,
     }
     try {
       const res = await axios.post('/api/completions', data)
@@ -29,21 +26,14 @@ const Home: NextPage = () => {
       console.log(err)
     }
   }
-  async function answers(e: any) {
+  async function search(e: any) {
     e.preventDefault()
     let inputValue = e.target[0].value
     let data = {
-      model: 'curie',
-      question: inputValue,
-      examples: [
-        ['How old is Elon Musk?', '50 years old'],
-        ['How long do dogs live?', '11 years old'],
-        ['What color is the sky?', 'Blue'],
-      ],
-      examples_context: 'Dogs live on average of 11 years',
+      prompt: inputValue,
     }
     try {
-      const res = await axios.post('api/answers', data)
+      const res = await axios.post('api/search', data)
     } catch (err) {
       console.log(err)
     }

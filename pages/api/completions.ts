@@ -1,20 +1,30 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import 'dotenv/config'
-import axios from 'axios'
+const OpenAI = require('openai-api');
 
+// Load your key from an environment variable or secret management service
+// (do not include your key directly in your code)
+const openAi_secret_key = process.env.OPENAI_SECRET_KEY
 
-let openAi_secret_key = process.env.OPENAI_SECRET_KEY
-
+const openai = new OpenAI(openAi_secret_key);
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  console.log(req.body)
-  let config = {
-    headers: {Authorization: `Bearer ${openAi_secret_key}`}
-  }
-  let resp = await axios.post("https://api.openai.com/v1/engines/text-curie-001/completions", req.body, config)
-  console.log(resp.data.choices[0].text)
+  let value = req.body
+  console.log(value)
+  const response = await openai.complete({
+    engine:'davinci',
+    prompt: value.prompt,
+    temperature: 0.5,
+    topP:0.1,
+    max_tokens: 64,
+    n: 1,
+    stop:"after a full sentence"
+     
+  });
+console.log(response.data)
 }
+

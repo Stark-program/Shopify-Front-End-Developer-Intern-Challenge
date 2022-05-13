@@ -28,6 +28,7 @@ export default async function handler(
   console.log(data)
   const response = await axios.post("https://api.openai.com/v1/engines/text-curie-001/completions",data,config)
   console.log(response.data)
+  res.send(response.data)
    
   };
 

@@ -35,4 +35,5 @@ export default async function handler(
     config
   )
   console.log(resp.data)
+  res.send(resp.data)
 }

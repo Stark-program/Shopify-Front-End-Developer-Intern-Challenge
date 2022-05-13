@@ -10,7 +10,7 @@ export default async function handler(
 ) {
   let data = {
     input: req.body.input,
-    instruction: req.body.instruction,
+    instruction: req.body.instruction, 
   }
   let config = {
     headers: { Authorization: `Bearer ${openAi_secret_key}` },
@@ -22,6 +22,7 @@ export default async function handler(
       config
     )
     console.log(response.data.choices[0])
+    res.send(response.data.choices[0])
   } catch (err) {
     console.log(err)
   }

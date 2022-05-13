@@ -14,11 +14,11 @@ const Home: NextPage = () => {
   const [isCompletions, setIsCompletions] = useState(false)
   const [isEdits, setIsEdits] = useState(false)
   const [isEditsInstructions, setIsEditsInstructions] = useState('')
-  console.log(isEditsInstructions)
 
-  async function completions(e: any) {
-    e.preventDefault()
-    let inputValue = e.target[0].value
+
+  async function completions(value: string | number) {
+    
+    let inputValue = value
     let data = {
       prompt: inputValue,
     }
@@ -29,29 +29,30 @@ const Home: NextPage = () => {
       console.log(err)
     }
   }
-  async function answers(e: any) {
-    e.preventDefault()
-    let inputValue = e.target[0].value
+  async function answers(value: string | number) {
+    
+    let inputValue = value
     let data = {
       documents: [isAnswersDocs],
       question: inputValue,
     }
     try {
       const res = await axios.post('api/answers', data)
+      console.log(res)
     } catch (err) {
       console.log(err)
     }
   }
-  async function edits(e: any) {
-    e.preventDefault()
-    let inputValue = e.target[0].value
+  async function edits(value: string | number) {
+   
+    let inputValue = value
     let data = {
       input: inputValue,
       instruction: isEditsInstructions,
     }
-    console.log(data)
     try {
       const res = await axios.post('api/edits', data)
+      console.log(res)
     } catch (err) {
       console.log(err)
     }
@@ -72,7 +73,8 @@ const Home: NextPage = () => {
                       desire! The first input field asks you to give the engine
                       some data to answer the question. Please construct your
                       question to pertain to this data.
-                      <br></br><br></br>This is an AI engineered bot that is programmed
+                      <br></br>
+                      <br></br>This is an AI engineered bot that is programmed
                       to give you the best response catered to your question.
                       This is done utilizing GPT-3 created by{' '}
                       <span className="text-blue-600 underline">
@@ -158,7 +160,20 @@ const Home: NextPage = () => {
       <div className="flex flex-col justify-center">
         <form
           className="mx-4 mt-10 flex flex-col justify-center"
-          onSubmit={answers}
+          onSubmit={(e: any) => {
+            e.preventDefault()
+            let value = e.target[0].value
+            switch (true) {
+              case isAnswers:
+                return answers(value)
+              case isCompletions:
+                return completions(value)
+              case isEdits:
+                return edits(value)
+              default:
+                return null
+            }
+          }}
         >
           <label className="flex justify-center" htmlFor="userInput">
             Enter your text below!

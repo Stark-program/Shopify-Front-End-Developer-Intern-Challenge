@@ -10,8 +10,11 @@ import { useState } from 'react'
 */
 const Home: NextPage = () => {
   const [isAnswers, setIsAnswers] = useState(false)
+  const [isAnswersDocs, setIsAnswersDocs] = useState('')
   const [isCompletions, setIsCompletions] = useState(false)
-  const [isCode, setIsCode] = useState(false)
+  const [isEdits, setIsEdits] = useState(false)
+  const [isEditsInstructions, setIsEditsInstructions] = useState('')
+  console.log(isEditsInstructions)
 
   async function completions(e: any) {
     e.preventDefault()
@@ -26,65 +29,32 @@ const Home: NextPage = () => {
       console.log(err)
     }
   }
-  async function search(e: any) {
+  async function answers(e: any) {
     e.preventDefault()
     let inputValue = e.target[0].value
     let data = {
-      prompt: inputValue,
+      documents: [isAnswersDocs],
+      question: inputValue,
     }
     try {
-      const res = await axios.post('api/search', data)
+      const res = await axios.post('api/answers', data)
     } catch (err) {
       console.log(err)
     }
   }
-  const RenderQuestionExplenation = () => {
-    return (
-      <p className="mx-2 text-center">
-        In this field you are welcome to ask any questions you desire! This is
-        an AI engineered bot that is programmed to give you the best response
-        catered to your question. This is done utilizing GPT-3 created by{' '}
-        <span className="text-blue-600 underline">
-          <a href="https://openai.com/api/" target="_blank">
-            OpenAI
-          </a>
-        </span>
-        !
-      </p>
-    )
-  }
-  const RenderCompletionExplenation = () => {
-    return (
-      <p className="mx-2 text-center">
-        In this field you are welcome to write any prompt you want and the bot
-        will do its best to finish the statement! This is an AI engineered bot
-        that is programmed to give you the best response catered to your input.
-        This is done utilizing GPT-3 created by{' '}
-        <span className="text-blue-600 underline">
-          <a href="https://openai.com/api/" target="_blank">
-            OpenAI
-          </a>
-        </span>
-        !
-      </p>
-    )
-  }
-  const RenderCodeExplenation = () => {
-    return (
-      <p className="mx-2 text-center">
-        In this field you are welcome to ask the AI to create a snippet of code,
-        try your best to give the bot as many details as possible to better
-        format the code you are looking for. This is an AI engineered bot that
-        is programmed to give you the best response catered to your input. This
-        is done utilizing GPT-3 created by{' '}
-        <span className="text-blue-600 underline">
-          <a href="https://openai.com/api/" target="_blank">
-            OpenAI
-          </a>
-        </span>
-        !
-      </p>
-    )
+  async function edits(e: any) {
+    e.preventDefault()
+    let inputValue = e.target[0].value
+    let data = {
+      input: inputValue,
+      instruction: isEditsInstructions,
+    }
+    console.log(data)
+    try {
+      const res = await axios.post('api/edits', data)
+    } catch (err) {
+      console.log(err)
+    }
   }
 
   return (
@@ -95,37 +65,119 @@ const Home: NextPage = () => {
           {(() => {
             switch (true) {
               case isAnswers:
-                return <RenderQuestionExplenation />
+                return (
+                  <div className="flex flex-col justify-center">
+                    <p className="mx-2 text-center">
+                      In this field you are welcome to ask any questions you
+                      desire! The first input field asks you to give the engine
+                      some data to answer the question. Please construct your
+                      question to pertain to this data.
+                      <br></br><br></br>This is an AI engineered bot that is programmed
+                      to give you the best response catered to your question.
+                      This is done utilizing GPT-3 created by{' '}
+                      <span className="text-blue-600 underline">
+                        <a href="https://openai.com/api/" target="_blank">
+                          OpenAI
+                        </a>
+                      </span>
+                      !
+                    </p>
+                    <h2 className="mt-6 text-center">
+                      Input your data below. Please seperate your entries by
+                      commas or it will not work.
+                    </h2>
+                    <h2 className="mt-2 text-center">HERE</h2>
+                    <input
+                      placeholder="example: Puppy A is happy, Puppy B is sad"
+                      className="mx-2 h-10 border-2 border-gray-300"
+                      value={isAnswersDocs}
+                      onChange={(e) => {
+                        e.preventDefault()
+                        setIsAnswersDocs(e.target.value)
+                      }}
+                    ></input>
+                  </div>
+                )
 
               case isCompletions:
-                return <RenderCompletionExplenation />
+                return (
+                  <p className="mx-2 text-center">
+                    In this field you are welcome to write any prompt you want
+                    and the bot will do its best to finish the statement! This
+                    is an AI engineered bot that is programmed to give you the
+                    best response catered to your input. This is done utilizing
+                    GPT-3 created by{' '}
+                    <span className="text-blue-600 underline">
+                      <a href="https://openai.com/api/" target="_blank">
+                        OpenAI
+                      </a>
+                    </span>
+                    !
+                  </p>
+                )
 
-              case isCode:
-                return <RenderCodeExplenation />
+              case isEdits:
+                return (
+                  <div className="flex flex-col justify-center">
+                    <p className="mx-2 text-center">
+                      In this field you are welcome to ask the AI to create a
+                      snippet of code, try your best to give the bot as many
+                      details as possible to better format the code you are
+                      looking for. This is an AI engineered bot that is
+                      programmed to give you the best response catered to your
+                      input. This is done utilizing GPT-3 created by{' '}
+                      <span className="text-blue-600 underline">
+                        <a href="https://openai.com/api/" target="_blank">
+                          OpenAI
+                        </a>
+                      </span>
+                      !
+                    </p>
+                    <h2 className="mt-6 text-center">
+                      Input your instructions of what you would like done to
+                      your text
+                    </h2>
+                    <h2 className="mt-2 text-center">HERE</h2>
+                    <input
+                      placeholder="example: fix the spelling mistakes"
+                      className="mx-2 h-10 border-2 border-gray-300"
+                      value={isEditsInstructions}
+                      onChange={(e) => {
+                        e.preventDefault()
+                        setIsEditsInstructions(e.target.value)
+                      }}
+                    ></input>
+                  </div>
+                )
               default:
                 return null
             }
           })()}
         </div>
       </div>
-      <form className="mt-10 flex flex-col" onSubmit={completions}>
-        <label className="flex justify-center" htmlFor="userInput">
-          Enter your text below!
-        </label>
-        <textarea
-          id="userInput"
-          name="userInput"
-          className="border-2 border-gray-700"
-          rows={10}
-          cols={50}
-        ></textarea>
-        <button
-          className="mt-2 rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
-          type="submit"
+      <div className="flex flex-col justify-center">
+        <form
+          className="mx-4 mt-10 flex flex-col justify-center"
+          onSubmit={answers}
         >
-          Submit
-        </button>
-      </form>
+          <label className="flex justify-center" htmlFor="userInput">
+            Enter your text below!
+          </label>
+          <textarea
+            id="userInput"
+            name="userInput"
+            className="border-2 border-gray-700"
+            rows={10}
+            cols={35}
+          ></textarea>
+          <button
+            className="mx-6 mt-2 flex justify-center rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
+            type="submit"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
       <div className="mt-4 flex">
         <select
           className="border-2 border-gray-400"
@@ -134,17 +186,17 @@ const Home: NextPage = () => {
             if (value === 'completion') {
               setIsCompletions(true)
               setIsAnswers(false)
-              setIsCode(false)
+              setIsEdits(false)
             } else if (value === 'answer') {
               setIsAnswers(true)
               setIsCompletions(false)
-              setIsCode(false)
-            } else if (value === 'code') {
-              setIsCode(true)
+              setIsEdits(false)
+            } else if (value === 'edits') {
+              setIsEdits(true)
               setIsCompletions(false)
               setIsAnswers(false)
             } else if (value === 'none') {
-              setIsCode(false)
+              setIsEdits(false)
               setIsAnswers(false)
               setIsCompletions(false)
             }
@@ -153,7 +205,7 @@ const Home: NextPage = () => {
           <option value="none">---Choose Your Engine---</option>
           <option value="completion">Completion</option>
           <option value="answer">Answer</option>
-          <option value="code">Code</option>
+          <option value="edits">Edit</option>
         </select>
       </div>
     </div>

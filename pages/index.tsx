@@ -1,6 +1,7 @@
 import type { NextPage } from 'next'
 import axios from 'axios'
 import { useState } from 'react'
+import { render } from '@testing-library/react'
 
 /*FOR THIS CHALLENGE THE APP MUST CONTAIN
 1. A SIMPLE INPUT FORM
@@ -9,28 +10,49 @@ import { useState } from 'react'
   THE ORIGINAL PROMPT AND A RESPONSE FROM THE API.
 */
 const Home: NextPage = () => {
+  const [chooseEngine, setChooseEngine] = useState(true)
   const [isAnswers, setIsAnswers] = useState(false)
   const [isAnswersDocs, setIsAnswersDocs] = useState('')
   const [isCompletions, setIsCompletions] = useState(false)
   const [isEdits, setIsEdits] = useState(false)
   const [isEditsInstructions, setIsEditsInstructions] = useState('')
+  const [responseReceived, setResponseReceived] = useState(false)
+  const [response, setResponse] = useState<CompletionResponse[]>([])
+  const [completionsPrompt, setCompletionsPrompt] = useState<string>("")
+ 
 
-
-  async function completions(value: string | number) {
+  interface CompletionResponse {
+    prompt: String
+    response: String
+  }
+  const renderEngine = () => {
+    return (
+      <div>
+        <h1>Please choose an engine</h1>
+      </div>
+    )
+  }
+  async function completions(value: string) {
     
     let inputValue = value
+    
     let data = {
       prompt: inputValue,
     }
     try {
       const res = await axios.post('/api/completions', data)
-      console.log(res)
+      let answer = {
+        prompt: res.data.prompt,
+        response: res.data.response,
+      }
+
+      setResponse((oldArray) => [...oldArray, answer])
+      setResponseReceived(true)
     } catch (err) {
       console.log(err)
     }
   }
   async function answers(value: string | number) {
-    
     let inputValue = value
     let data = {
       documents: [isAnswersDocs],
@@ -44,7 +66,6 @@ const Home: NextPage = () => {
     }
   }
   async function edits(value: string | number) {
-   
     let inputValue = value
     let data = {
       input: inputValue,
@@ -58,10 +79,26 @@ const Home: NextPage = () => {
     }
   }
 
+  const renderResponse = (response: Array<Object>) => {
+    return response.map((res: any) => {
+      return (
+        <div>
+          <ul>
+            <li key={Math.random() * 10}>
+              <h1>{res.prompt}</h1>
+              <p>{res.response}</p>
+            </li>
+          </ul>
+        </div>
+      )
+    })
+  }
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
       <div className="max-w-xl">
         <h1 className="text-center text-[30px]">Fun With AI!</h1>
+        {chooseEngine ? renderEngine() : null}
         <div>
           {(() => {
             switch (true) {
@@ -88,7 +125,7 @@ const Home: NextPage = () => {
                       Input your data below. Please seperate your entries by
                       commas or it will not work.
                     </h2>
-                    <h2 className="mt-2 text-center">HERE</h2>
+
                     <input
                       placeholder="example: Puppy A is happy, Puppy B is sad"
                       className="mx-2 h-10 border-2 border-gray-300"
@@ -139,7 +176,7 @@ const Home: NextPage = () => {
                       Input your instructions of what you would like done to
                       your text
                     </h2>
-                    <h2 className="mt-2 text-center">HERE</h2>
+
                     <input
                       placeholder="example: fix the spelling mistakes"
                       className="mx-2 h-10 border-2 border-gray-300"
@@ -184,6 +221,7 @@ const Home: NextPage = () => {
             className="border-2 border-gray-700"
             rows={10}
             cols={35}
+            
           ></textarea>
           <button
             className="mx-6 mt-2 flex justify-center rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
@@ -202,18 +240,22 @@ const Home: NextPage = () => {
               setIsCompletions(true)
               setIsAnswers(false)
               setIsEdits(false)
+              setChooseEngine(false)
             } else if (value === 'answer') {
               setIsAnswers(true)
               setIsCompletions(false)
               setIsEdits(false)
+              setChooseEngine(false)
             } else if (value === 'edits') {
               setIsEdits(true)
               setIsCompletions(false)
               setIsAnswers(false)
+              setChooseEngine(false)
             } else if (value === 'none') {
               setIsEdits(false)
               setIsAnswers(false)
               setIsCompletions(false)
+              setChooseEngine(true)
             }
           }}
         >
@@ -223,6 +265,10 @@ const Home: NextPage = () => {
           <option value="edits">Edit</option>
         </select>
       </div>
+      <div>
+        <h1 className="bold mt-4 text-[20px]">RESPONSES</h1>
+      </div>
+      <div>{responseReceived ? renderResponse(response) : null}</div>
     </div>
   )
 }

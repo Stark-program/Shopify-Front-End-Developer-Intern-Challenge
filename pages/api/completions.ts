@@ -25,11 +25,12 @@ export default async function handler(
       top_p: 1.0,
       temperature: 0
     }
-  console.log(data)
   const response = await axios.post("https://api.openai.com/v1/engines/text-curie-001/completions",data,config)
-  console.log(response.data)
-  res.send(response.data)
-   
+  let configureRes = {
+    response: response.data.choices[0].text,
+    prompt: value.prompt
+  }
+  res.send(configureRes)
   };
 
 }

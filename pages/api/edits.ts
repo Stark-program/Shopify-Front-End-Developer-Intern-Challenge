@@ -21,7 +21,6 @@ export default async function handler(
       data,
       config
     )
-    console.log(response.data.choices[0])
     let configureRes = {
       endpoint: "Edit",
       input: data.input,

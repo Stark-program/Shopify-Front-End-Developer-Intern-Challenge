@@ -26,7 +26,7 @@ const Home: NextPage = () => {
   const renderEngineChoice = () => {
     return (
       <div>
-        <h1>Please choose an engine</h1>
+        <h1>Please choose a category</h1>
       </div>
     )
   }

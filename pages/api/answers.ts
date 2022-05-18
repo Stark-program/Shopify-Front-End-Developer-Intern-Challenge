@@ -1,14 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import 'dotenv/config'
 import axios from 'axios'
-import { responseSymbol } from 'next/dist/server/web/spec-compliant/fetch-event'
-const OpenAI = require('openai-api')
 
-// Load your key from an environment variable or secret management service
-// (do not include your key directly in your code)
 const openAi_secret_key = process.env.OPENAI_SECRET_KEY
-
-const openai = new OpenAI(openAi_secret_key)
 
 export default async function handler(
   req: NextApiRequest,
@@ -26,20 +20,25 @@ export default async function handler(
     max_tokens: 5,
     stop: ['/n', '<|end of text|>'],
   }
-  
+
   let config = {
     headers: { Authorization: `Bearer ${openAi_secret_key}` },
   }
-  const resp = await axios.post(
-    'https://api.openai.com/v1/answers',
-    data,
-    config
-  )
-  let configureRes = {
-    endpoint: "Answer",
-    input: data.documents,    
-    response: resp.data.answers[0],
-    prompt: data.question
+
+  try {
+    const resp = await axios.post(
+      'https://api.openai.com/v1/answers',
+      data,
+      config
+    )
+    let configureRes = {
+      endpoint: 'Answer',
+      input: data.documents,
+      response: resp.data.answers[0],
+      prompt: data.question,
+    }
+    res.send(configureRes)
+  } catch (err) {
+    console.log(err)
   }
-  res.send(configureRes)
 }

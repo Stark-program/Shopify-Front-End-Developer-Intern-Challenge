@@ -23,13 +23,16 @@ const Home: NextPage = () => {
     prompt: String
     response: String
   }
-  const renderEngine = () => {
+  const renderEngineChoice = () => {
     return (
       <div>
         <h1>Please choose an engine</h1>
       </div>
     )
   }
+
+  //Completions API Endpoint
+
   async function completions(value: string | number) {
     let inputValue = value
 
@@ -49,6 +52,9 @@ const Home: NextPage = () => {
       console.log(err)
     }
   }
+
+  //Answers API endpoint
+
   async function answers(value: string | number) {
     let inputValue = value
     let data = {
@@ -57,7 +63,6 @@ const Home: NextPage = () => {
     }
     try {
       const res = await axios.post('api/answers', data)
-      console.log(res)
       let answer = {
         endpoint: res.data.endpoint,
         input: res.data.input,
@@ -70,6 +75,9 @@ const Home: NextPage = () => {
       console.log(err)
     }
   }
+
+  //Edit API endpoint
+
   async function edits(value: string | number) {
     let inputValue = value
     let data = {
@@ -78,7 +86,6 @@ const Home: NextPage = () => {
     }
     try {
       const res = await axios.post('api/edits', data)
-      console.log(res.data)
       let answer = {
         endpoint: res.data.endpoint,
         input: res.data.input,
@@ -91,6 +98,8 @@ const Home: NextPage = () => {
       console.log(err)
     }
   }
+
+  // Two of the endpoints have a different property because they require another text field. This is to check for that property and render accordingly. 
   const checkProperty = (obj: any) => {
     if (obj.hasOwnProperty('input')) {
       return (
@@ -103,7 +112,6 @@ const Home: NextPage = () => {
   const renderResponse = (response: Array<Object>) => {
     let reverseArr = [...response].reverse()
     return reverseArr.map((res: any) => {
-      console.log(res)
       return (
         <div className="my-4 rounded bg-gray-200">
           <ul>
@@ -130,7 +138,7 @@ const Home: NextPage = () => {
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
       <div className="max-w-xl">
         <h1 className="text-center text-[30px]">Fun With AI!</h1>
-        {chooseEngine ? renderEngine() : null}
+        {chooseEngine ? renderEngineChoice() : null}
         <div>
           {(() => {
             switch (true) {

@@ -27,6 +27,7 @@ export default async function handler(
     }
   const response = await axios.post("https://api.openai.com/v1/engines/text-curie-001/completions",data,config)
   let configureRes = {
+    endpoint: "Completion",
     response: response.data.choices[0].text,
     prompt: value.prompt
   }

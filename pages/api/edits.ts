@@ -22,7 +22,13 @@ export default async function handler(
       config
     )
     console.log(response.data.choices[0])
-    res.send(response.data.choices[0])
+    let configureRes = {
+      endpoint: "Edit",
+      input: data.input,
+      response: response.data.choices[0].text,
+      prompt: data.instruction
+    }
+    res.send(configureRes)
   } catch (err) {
     console.log(err)
   }

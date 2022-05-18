@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import 'dotenv/config'
 import axios from 'axios'
+import { responseSymbol } from 'next/dist/server/web/spec-compliant/fetch-event'
 const OpenAI = require('openai-api')
 
 // Load your key from an environment variable or secret management service
@@ -25,7 +26,7 @@ export default async function handler(
     max_tokens: 5,
     stop: ['/n', '<|end of text|>'],
   }
-  console.log(data)
+  
   let config = {
     headers: { Authorization: `Bearer ${openAi_secret_key}` },
   }
@@ -34,6 +35,11 @@ export default async function handler(
     data,
     config
   )
-  console.log(resp.data)
-  res.send(resp.data)
+  let configureRes = {
+    endpoint: "Answer",
+    input: data.documents,    
+    response: resp.data.answers[0],
+    prompt: data.question
+  }
+  res.send(configureRes)
 }

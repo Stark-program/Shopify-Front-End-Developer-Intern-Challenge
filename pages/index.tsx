@@ -1,7 +1,6 @@
 import type { NextPage } from 'next'
 import axios from 'axios'
 import { useState } from 'react'
-import { render } from '@testing-library/react'
 
 /*FOR THIS CHALLENGE THE APP MUST CONTAIN
 1. A SIMPLE INPUT FORM
@@ -10,6 +9,7 @@ import { render } from '@testing-library/react'
   THE ORIGINAL PROMPT AND A RESPONSE FROM THE API.
 */
 const Home: NextPage = () => {
+  const [textArea, setTextArea] = useState('')
   const [chooseEngine, setChooseEngine] = useState(true)
   const [isAnswers, setIsAnswers] = useState(false)
   const [isAnswersDocs, setIsAnswersDocs] = useState('')
@@ -18,8 +18,6 @@ const Home: NextPage = () => {
   const [isEditsInstructions, setIsEditsInstructions] = useState('')
   const [responseReceived, setResponseReceived] = useState(false)
   const [response, setResponse] = useState<CompletionResponse[]>([])
-  const [completionsPrompt, setCompletionsPrompt] = useState<string>("")
- 
 
   interface CompletionResponse {
     prompt: String
@@ -32,20 +30,19 @@ const Home: NextPage = () => {
       </div>
     )
   }
-  async function completions(value: string) {
-    
+  async function completions(value: string | number) {
     let inputValue = value
-    
+
     let data = {
       prompt: inputValue,
     }
     try {
       const res = await axios.post('/api/completions', data)
       let answer = {
+        endpoint: res.data.endpoint,
         prompt: res.data.prompt,
         response: res.data.response,
       }
-
       setResponse((oldArray) => [...oldArray, answer])
       setResponseReceived(true)
     } catch (err) {
@@ -61,6 +58,14 @@ const Home: NextPage = () => {
     try {
       const res = await axios.post('api/answers', data)
       console.log(res)
+      let answer = {
+        endpoint: res.data.endpoint,
+        input: res.data.input,
+        prompt: res.data.prompt,
+        response: res.data.response,
+      }
+      setResponse((oldArray) => [...oldArray, answer])
+      setResponseReceived(true)
     } catch (err) {
       console.log(err)
     }
@@ -73,20 +78,47 @@ const Home: NextPage = () => {
     }
     try {
       const res = await axios.post('api/edits', data)
-      console.log(res)
+      console.log(res.data)
+      let answer = {
+        endpoint: res.data.endpoint,
+        input: res.data.input,
+        prompt: res.data.prompt,
+        response: res.data.response,
+      }
+      setResponse((oldArray) => [...oldArray, answer])
+      setResponseReceived(true)
     } catch (err) {
       console.log(err)
     }
   }
-
-  const renderResponse = (response: Array<Object>) => {
-    return response.map((res: any) => {
+  const checkProperty = (obj: any) => {
+    if (obj.hasOwnProperty('input')) {
       return (
-        <div>
+        <>
+          <h4>{obj.input}</h4>
+        </>
+      )
+    }
+  }
+  const renderResponse = (response: Array<Object>) => {
+    let reverseArr = [...response].reverse()
+    return reverseArr.map((res: any) => {
+      console.log(res)
+      return (
+        <div className="my-4 rounded bg-gray-200">
           <ul>
-            <li key={Math.random() * 10}>
-              <h1>{res.prompt}</h1>
-              <p>{res.response}</p>
+            <li key={Math.random() * 10} className="py-4 px-4">
+              <h4 className="text-gray-400/75">{res.endpoint}</h4>
+              <h1 className="text-center text-[25px]">
+                Prompt: <span className="font-serif">{res.prompt}</span>
+              </h1>
+              <h4 className="text-center">{checkProperty(res)}</h4>
+              <p className="text-center">
+                <span className="bold text-[18px] underline decoration-slate-600">
+                  API Response:{' '}
+                </span>
+                {res.response}
+              </p>
             </li>
           </ul>
         </div>
@@ -159,12 +191,15 @@ const Home: NextPage = () => {
                 return (
                   <div className="flex flex-col justify-center">
                     <p className="mx-2 text-center">
-                      In this field you are welcome to ask the AI to create a
-                      snippet of code, try your best to give the bot as many
-                      details as possible to better format the code you are
-                      looking for. This is an AI engineered bot that is
-                      programmed to give you the best response catered to your
-                      input. This is done utilizing GPT-3 created by{' '}
+                      In this field you are welcome to ask the AI to edit any
+                      piece of text you want. <br></br>
+                      You will first give the AI some instructions on what to do
+                      with the text. (this is the smaller input field) <br></br>
+                      You will then input the text in the bigger area below.{' '}
+                      <br></br>
+                      This is an AI engineered bot that is programmed to give
+                      you the best response catered to your input. This is done
+                      utilizing GPT-3 created by{' '}
                       <span className="text-blue-600 underline">
                         <a href="https://openai.com/api/" target="_blank">
                           OpenAI
@@ -201,12 +236,20 @@ const Home: NextPage = () => {
             e.preventDefault()
             let value = e.target[0].value
             switch (true) {
-              case isAnswers:
+              case isAnswers: {
+                setIsAnswersDocs('')
+                setTextArea('')
                 return answers(value)
-              case isCompletions:
+              }
+              case isCompletions: {
+                setTextArea("")
                 return completions(value)
-              case isEdits:
+              }
+              case isEdits: {
+                setIsEditsInstructions("")
+                setTextArea("")
                 return edits(value)
+              }
               default:
                 return null
             }
@@ -218,10 +261,12 @@ const Home: NextPage = () => {
           <textarea
             id="userInput"
             name="userInput"
-            className="border-2 border-gray-700"
-            rows={10}
-            cols={35}
-            
+            className="h-96 w-96 border-2 border-gray-700"
+            value={textArea}
+            onChange={(e) => {
+              e.preventDefault()
+              setTextArea(e.target.value)
+            }}
           ></textarea>
           <button
             className="mx-6 mt-2 flex justify-center rounded bg-blue-500 py-2 px-4 font-bold text-white hover:bg-blue-700"
@@ -237,21 +282,25 @@ const Home: NextPage = () => {
           onChange={(e) => {
             let value = e.target.value
             if (value === 'completion') {
+              setTextArea('')
               setIsCompletions(true)
               setIsAnswers(false)
               setIsEdits(false)
               setChooseEngine(false)
             } else if (value === 'answer') {
+              setTextArea('')
               setIsAnswers(true)
               setIsCompletions(false)
               setIsEdits(false)
               setChooseEngine(false)
             } else if (value === 'edits') {
+              setTextArea('')
               setIsEdits(true)
               setIsCompletions(false)
               setIsAnswers(false)
               setChooseEngine(false)
             } else if (value === 'none') {
+              setTextArea('')
               setIsEdits(false)
               setIsAnswers(false)
               setIsCompletions(false)

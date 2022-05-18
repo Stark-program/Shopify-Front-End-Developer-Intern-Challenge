@@ -316,7 +316,7 @@ const Home: NextPage = () => {
             }
           }}
         >
-          <option value="none">---Choose Your Engine---</option>
+          <option value="none">---Choose Your Category---</option>
           <option value="completion">Completion</option>
           <option value="answer">Answer</option>
           <option value="edits">Edit</option>

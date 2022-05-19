@@ -2,6 +2,7 @@ import type { NextPage } from 'next'
 import axios from 'axios'
 import { useState } from 'react'
 
+
 /*FOR THIS CHALLENGE THE APP MUST CONTAIN
 1. A SIMPLE INPUT FORM
 2. SUBMITTING THE FORM SUBMITS THE PROMPT TO THE OPENAI
@@ -23,14 +24,6 @@ const Home: NextPage = () => {
     prompt: String
     response: String
   }
-  const renderEngineChoice = () => {
-    return (
-      <div>
-        <h1>Please choose a category</h1>
-      </div>
-    )
-  }
-
   //Completions API Endpoint
 
   async function completions(value: string | number) {
@@ -100,7 +93,7 @@ const Home: NextPage = () => {
   }
 
   // Two of the endpoints have a different property because they require another text field. This is to check for that property and render accordingly. 
-  const checkProperty = (obj: any) => {
+  function checkProperty (obj: any) {
     if (obj.hasOwnProperty('input')) {
       return (
         <>
@@ -109,7 +102,17 @@ const Home: NextPage = () => {
       )
     }
   }
-  const renderResponse = (response: Array<Object>) => {
+
+  //All of the render functions. 
+
+  function renderEngineChoice () {
+    return (
+      <div>
+        <h1>Please choose a category</h1>
+      </div>
+    )
+  }
+  function renderResponse () {
     let reverseArr = [...response].reverse()
     return reverseArr.map((res: any) => {
       return (
@@ -133,108 +136,106 @@ const Home: NextPage = () => {
       )
     })
   }
+  function renderAnswers() {
+    return (
+      <div className="flex flex-col justify-center">
+        <p className="mx-2 text-center">
+          In this field you are welcome to ask any questions you
+          desire! The first input field asks you to give the engine
+          some data to answer the question. Please construct your
+          question to pertain to this data.
+          <br></br>
+          <br></br>This is an AI engineered bot that is programmed
+          to give you the best response catered to your question.
+          This is done utilizing GPT-3 created by{' '}
+          <span className="text-blue-600 underline">
+            <a href="https://openai.com/api/" target="_blank">
+              OpenAI
+            </a>
+          </span>
+          !
+        </p>
+        <h2 className="mt-6 text-center">
+          Input your data below. Please seperate your entries by
+          commas or it will not work.
+        </h2>
+
+        <input
+          placeholder="example: Puppy A is happy, Puppy B is sad"
+          className="mx-2 h-10 border-2 border-gray-300"
+          value={isAnswersDocs}
+          onChange={(e) => {
+            e.preventDefault()
+            setIsAnswersDocs(e.target.value)
+          }}
+        ></input>
+      </div>
+    )
+  }
+  function renderCompletion() {
+    return (
+      <p className="mx-2 text-center">
+        In this field you are welcome to write any prompt you want
+        and the bot will do its best to finish the statement! This
+        is an AI engineered bot that is programmed to give you the
+        best response catered to your input. This is done utilizing
+        GPT-3 created by{' '}
+        <span className="text-blue-600 underline">
+          <a href="https://openai.com/api/" target="_blank">
+            OpenAI
+          </a>
+        </span>
+        !
+      </p>
+    )
+  }
+  function renderEdit() {
+    return (
+      <div className="flex flex-col justify-center">
+        <p className="mx-2 text-center">
+          In this field you are welcome to ask the AI to edit any
+          piece of text you want. <br></br>
+          You will first give the AI some instructions on what to do
+          with the text. (this is the smaller input field) <br></br>
+          You will then input the text in the bigger area below.{' '}
+          <br></br>
+          This is an AI engineered bot that is programmed to give
+          you the best response catered to your input. This is done
+          utilizing GPT-3 created by{' '}
+          <span className="text-blue-600 underline">
+            <a href="https://openai.com/api/" target="_blank">
+              OpenAI
+            </a>
+          </span>
+          !
+        </p>
+        <h2 className="mt-6 text-center">
+          Input your instructions of what you would like done to
+          your text
+        </h2>
+
+        <input
+          placeholder="example: fix the spelling mistakes"
+          className="mx-2 h-10 border-2 border-gray-300"
+          value={isEditsInstructions}
+          onChange={(e) => {
+            e.preventDefault()
+            setIsEditsInstructions(e.target.value)
+          }}
+        ></input>
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
       <div className="max-w-xl">
         <h1 className="text-center text-[30px]">Fun With AI!</h1>
-        {chooseEngine ? renderEngineChoice() : null}
+        {chooseEngine && renderEngineChoice()}
         <div>
-          {(() => {
-            switch (true) {
-              case isAnswers:
-                return (
-                  <div className="flex flex-col justify-center">
-                    <p className="mx-2 text-center">
-                      In this field you are welcome to ask any questions you
-                      desire! The first input field asks you to give the engine
-                      some data to answer the question. Please construct your
-                      question to pertain to this data.
-                      <br></br>
-                      <br></br>This is an AI engineered bot that is programmed
-                      to give you the best response catered to your question.
-                      This is done utilizing GPT-3 created by{' '}
-                      <span className="text-blue-600 underline">
-                        <a href="https://openai.com/api/" target="_blank">
-                          OpenAI
-                        </a>
-                      </span>
-                      !
-                    </p>
-                    <h2 className="mt-6 text-center">
-                      Input your data below. Please seperate your entries by
-                      commas or it will not work.
-                    </h2>
-
-                    <input
-                      placeholder="example: Puppy A is happy, Puppy B is sad"
-                      className="mx-2 h-10 border-2 border-gray-300"
-                      value={isAnswersDocs}
-                      onChange={(e) => {
-                        e.preventDefault()
-                        setIsAnswersDocs(e.target.value)
-                      }}
-                    ></input>
-                  </div>
-                )
-
-              case isCompletions:
-                return (
-                  <p className="mx-2 text-center">
-                    In this field you are welcome to write any prompt you want
-                    and the bot will do its best to finish the statement! This
-                    is an AI engineered bot that is programmed to give you the
-                    best response catered to your input. This is done utilizing
-                    GPT-3 created by{' '}
-                    <span className="text-blue-600 underline">
-                      <a href="https://openai.com/api/" target="_blank">
-                        OpenAI
-                      </a>
-                    </span>
-                    !
-                  </p>
-                )
-
-              case isEdits:
-                return (
-                  <div className="flex flex-col justify-center">
-                    <p className="mx-2 text-center">
-                      In this field you are welcome to ask the AI to edit any
-                      piece of text you want. <br></br>
-                      You will first give the AI some instructions on what to do
-                      with the text. (this is the smaller input field) <br></br>
-                      You will then input the text in the bigger area below.{' '}
-                      <br></br>
-                      This is an AI engineered bot that is programmed to give
-                      you the best response catered to your input. This is done
-                      utilizing GPT-3 created by{' '}
-                      <span className="text-blue-600 underline">
-                        <a href="https://openai.com/api/" target="_blank">
-                          OpenAI
-                        </a>
-                      </span>
-                      !
-                    </p>
-                    <h2 className="mt-6 text-center">
-                      Input your instructions of what you would like done to
-                      your text
-                    </h2>
-
-                    <input
-                      placeholder="example: fix the spelling mistakes"
-                      className="mx-2 h-10 border-2 border-gray-300"
-                      value={isEditsInstructions}
-                      onChange={(e) => {
-                        e.preventDefault()
-                        setIsEditsInstructions(e.target.value)
-                      }}
-                    ></input>
-                  </div>
-                )
-              default:
-                return null
-            }
-          })()}
+          {isAnswers && renderAnswers()}
+          {isCompletions && renderCompletion()}
+          {isEdits && renderEdit()}
         </div>
       </div>
       <div className="flex flex-col justify-center">
@@ -325,7 +326,7 @@ const Home: NextPage = () => {
       <div>
         <h1 className="bold mt-4 text-[20px]">RESPONSES</h1>
       </div>
-      <div>{responseReceived ? renderResponse(response) : null}</div>
+      {responseReceived && <div>{renderResponse()}</div>}
     </div>
   )
 }

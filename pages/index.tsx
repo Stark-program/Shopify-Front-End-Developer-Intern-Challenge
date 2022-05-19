@@ -2,7 +2,6 @@ import type { NextPage } from 'next'
 import axios from 'axios'
 import { useState } from 'react'
 
-
 /*FOR THIS CHALLENGE THE APP MUST CONTAIN
 1. A SIMPLE INPUT FORM
 2. SUBMITTING THE FORM SUBMITS THE PROMPT TO THE OPENAI
@@ -34,15 +33,20 @@ const Home: NextPage = () => {
     }
     try {
       const res = await axios.post('/api/completions', data)
-      let answer = {
-        endpoint: res.data.endpoint,
-        prompt: res.data.prompt,
-        response: res.data.response,
+      console.log(res)
+      if ('endpoint' in res.data) {
+        let answer = {
+          endpoint: res.data.endpoint,
+          prompt: res.data.prompt,
+          response: res.data.response,
+        }
+        setResponse((oldArray) => [...oldArray, answer])
+        setResponseReceived(true)
+      } else {
+        alert('Something went wrong')
       }
-      setResponse((oldArray) => [...oldArray, answer])
-      setResponseReceived(true)
     } catch (err) {
-      console.log(err)
+      console.log('this is an error', err)
     }
   }
 
@@ -56,14 +60,18 @@ const Home: NextPage = () => {
     }
     try {
       const res = await axios.post('api/answers', data)
-      let answer = {
-        endpoint: res.data.endpoint,
-        input: res.data.input,
-        prompt: res.data.prompt,
-        response: res.data.response,
+      if ('endpoint' in res.data) {
+        let answer = {
+          endpoint: res.data.endpoint,
+          input: res.data.input,
+          prompt: res.data.prompt,
+          response: res.data.response,
+        }
+        setResponse((oldArray) => [...oldArray, answer])
+        setResponseReceived(true)
+      } else {
+        alert('Something went wrong')
       }
-      setResponse((oldArray) => [...oldArray, answer])
-      setResponseReceived(true)
     } catch (err) {
       console.log(err)
     }
@@ -79,21 +87,25 @@ const Home: NextPage = () => {
     }
     try {
       const res = await axios.post('api/edits', data)
-      let answer = {
-        endpoint: res.data.endpoint,
-        input: res.data.input,
-        prompt: res.data.prompt,
-        response: res.data.response,
+      if ('endpoint' in res.data) {
+        let answer = {
+          endpoint: res.data.endpoint,
+          input: res.data.input,
+          prompt: res.data.prompt,
+          response: res.data.response,
+        }
+        setResponse((oldArray) => [...oldArray, answer])
+        setResponseReceived(true)
+      } else {
+        alert('Something went wrong')
       }
-      setResponse((oldArray) => [...oldArray, answer])
-      setResponseReceived(true)
     } catch (err) {
       console.log(err)
     }
   }
 
-  // Two of the endpoints have a different property because they require another text field. This is to check for that property and render accordingly. 
-  function checkProperty (obj: any) {
+  // Two of the endpoints have a different property because they require another text field. This is to check for that property and render accordingly.
+  function checkProperty(obj: any) {
     if (obj.hasOwnProperty('input')) {
       return (
         <>
@@ -103,16 +115,16 @@ const Home: NextPage = () => {
     }
   }
 
-  //All of the render functions. 
+  //All of the render functions.
 
-  function renderEngineChoice () {
+  function renderEngineChoice() {
     return (
       <div>
         <h1>Please choose a category</h1>
       </div>
     )
   }
-  function renderResponse () {
+  function renderResponse() {
     let reverseArr = [...response].reverse()
     return reverseArr.map((res: any) => {
       return (
@@ -140,14 +152,13 @@ const Home: NextPage = () => {
     return (
       <div className="flex flex-col justify-center">
         <p className="mx-2 text-center">
-          In this field you are welcome to ask any questions you
-          desire! The first input field asks you to give the engine
-          some data to answer the question. Please construct your
-          question to pertain to this data.
+          In this field you are welcome to ask any questions you desire! The
+          first input field asks you to give the engine some data to answer the
+          question. Please construct your question to pertain to this data.
           <br></br>
-          <br></br>This is an AI engineered bot that is programmed
-          to give you the best response catered to your question.
-          This is done utilizing GPT-3 created by{' '}
+          <br></br>This is an AI engineered bot that is programmed to give you
+          the best response catered to your question. This is done utilizing
+          GPT-3 created by{' '}
           <span className="text-blue-600 underline">
             <a href="https://openai.com/api/" target="_blank">
               OpenAI
@@ -156,8 +167,8 @@ const Home: NextPage = () => {
           !
         </p>
         <h2 className="mt-6 text-center">
-          Input your data below. Please seperate your entries by
-          commas or it will not work.
+          Input your data below. Please seperate your entries by commas or it
+          will not work.
         </h2>
 
         <input
@@ -175,11 +186,10 @@ const Home: NextPage = () => {
   function renderCompletion() {
     return (
       <p className="mx-2 text-center">
-        In this field you are welcome to write any prompt you want
-        and the bot will do its best to finish the statement! This
-        is an AI engineered bot that is programmed to give you the
-        best response catered to your input. This is done utilizing
-        GPT-3 created by{' '}
+        In this field you are welcome to write any prompt you want and the bot
+        will do its best to finish the statement! This is an AI engineered bot
+        that is programmed to give you the best response catered to your input.
+        This is done utilizing GPT-3 created by{' '}
         <span className="text-blue-600 underline">
           <a href="https://openai.com/api/" target="_blank">
             OpenAI
@@ -193,15 +203,14 @@ const Home: NextPage = () => {
     return (
       <div className="flex flex-col justify-center">
         <p className="mx-2 text-center">
-          In this field you are welcome to ask the AI to edit any
-          piece of text you want. <br></br>
-          You will first give the AI some instructions on what to do
-          with the text. (this is the smaller input field) <br></br>
-          You will then input the text in the bigger area below.{' '}
-          <br></br>
-          This is an AI engineered bot that is programmed to give
-          you the best response catered to your input. This is done
-          utilizing GPT-3 created by{' '}
+          In this field you are welcome to ask the AI to edit any piece of text
+          you want. <br></br>
+          You will first give the AI some instructions on what to do with the
+          text. (this is the smaller input field) <br></br>
+          You will then input the text in the bigger area below. <br></br>
+          This is an AI engineered bot that is programmed to give you the best
+          response catered to your input. This is done utilizing GPT-3 created
+          by{' '}
           <span className="text-blue-600 underline">
             <a href="https://openai.com/api/" target="_blank">
               OpenAI
@@ -210,8 +219,7 @@ const Home: NextPage = () => {
           !
         </p>
         <h2 className="mt-6 text-center">
-          Input your instructions of what you would like done to
-          your text
+          Input your instructions of what you would like done to your text
         </h2>
 
         <input
@@ -251,12 +259,12 @@ const Home: NextPage = () => {
                 return answers(value)
               }
               case isCompletions: {
-                setTextArea("")
+                setTextArea('')
                 return completions(value)
               }
               case isEdits: {
-                setIsEditsInstructions("")
-                setTextArea("")
+                setIsEditsInstructions('')
+                setTextArea('')
                 return edits(value)
               }
               default:

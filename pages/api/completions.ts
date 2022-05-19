@@ -1,9 +1,7 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next'
 import 'dotenv/config'
-import axios from 'axios'
-
-const openAi_secret_key = process.env.OPENAI_SECRET_KEY
+import { axiosDefaultHeader } from './axios/default_header'
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,10 +10,6 @@ export default async function handler(
   {
     let value = req.body
 
-    let config = {
-      headers: { Authorization: `Bearer ${openAi_secret_key}` },
-    }
-
     let data = {
       prompt: value.prompt,
       max_tokens: 64,
@@ -23,10 +17,9 @@ export default async function handler(
       temperature: 0,
     }
     try {
-      const response = await axios.post(
+      const response = await axiosDefaultHeader.post(
         'https://api.openai.com/v1/engines/text-curie-001/completions',
         data,
-        config
       )
       let configureRes = {
         endpoint: 'Completion',

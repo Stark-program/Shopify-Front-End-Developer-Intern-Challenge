@@ -1,8 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import 'dotenv/config'
-import axios from 'axios'
-
-let openAi_secret_key = process.env.OPENAI_SECRET_KEY
+import { axiosDefaultHeader } from './axios/default_header'
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,14 +10,11 @@ export default async function handler(
     input: req.body.input,
     instruction: req.body.instruction, 
   }
-  let config = {
-    headers: { Authorization: `Bearer ${openAi_secret_key}` },
-  }
+ 
   try {
-    const response = await axios.post(
+    const response = await axiosDefaultHeader.post(
       'https://api.openai.com/v1/engines/text-davinci-edit-001/edits',
       data,
-      config
     )
     let configureRes = {
       endpoint: "Edit",

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import 'dotenv/config'
-import axios from 'axios'
+
+import {axiosDefaultHeader} from './axios/default_header'
 
 const openAi_secret_key = process.env.OPENAI_SECRET_KEY
 
@@ -21,15 +22,10 @@ export default async function handler(
     stop: ['/n', '<|end of text|>'],
   }
 
-  let config = {
-    headers: { Authorization: `Bearer ${openAi_secret_key}` },
-  }
-
   try {
-    const resp = await axios.post(
+    const resp = await axiosDefaultHeader.post(
       'https://api.openai.com/v1/answers',
       data,
-      config
     )
     let configureRes = {
       endpoint: 'Answer',

@@ -121,7 +121,7 @@ const Home: NextPage = () => {
   function renderEngineChoice() {
     return (
       <div>
-        <h1>Please choose a category</h1>
+        <h1 className='text-center'>Please choose a category</h1>
       </div>
     )
   }
@@ -249,6 +249,28 @@ const Home: NextPage = () => {
       <div className="max-w-xl">
         <h1 className="text-center text-[30px]">Fun With AI!</h1>
         {chooseEngine && renderEngineChoice()}
+        <div className="mt-4 flex">
+        <select
+          className="border-2 border-gray-400"
+          onChange={(e) => {
+            let value = e.target.value
+            if (value === 'completion') {
+              checkIfTrue(false,true,false)
+            } else if (value === 'answer') {
+              checkIfTrue(true,false,false)
+            } else if (value === 'edits') {
+              checkIfTrue(false,false,true)
+            } else if (value === 'none') {
+              checkIfTrue(false,false,false)
+            }
+          }}
+        >
+          <option value="none">---Choose Your Category---</option>
+          <option value="completion">Completion</option>
+          <option value="answer">Answer</option>
+          <option value="edits">Edit</option>
+        </select>
+      </div>
         <div>
           {isAnswers && renderAnswers()}
           {isCompletions && renderCompletion()}
@@ -302,28 +324,7 @@ const Home: NextPage = () => {
           </button>
         </form>
       </div>
-      <div className="mt-4 flex">
-        <select
-          className="border-2 border-gray-400"
-          onChange={(e) => {
-            let value = e.target.value
-            if (value === 'completion') {
-              checkIfTrue(false,true,false)
-            } else if (value === 'answer') {
-              checkIfTrue(true,false,false)
-            } else if (value === 'edits') {
-              checkIfTrue(false,false,true)
-            } else if (value === 'none') {
-              checkIfTrue(false,false,false)
-            }
-          }}
-        >
-          <option value="none">---Choose Your Category---</option>
-          <option value="completion">Completion</option>
-          <option value="answer">Answer</option>
-          <option value="edits">Edit</option>
-        </select>
-      </div>
+      
       <div>
         <h1 className="bold mt-4 text-[20px]">RESPONSES</h1>
       </div>

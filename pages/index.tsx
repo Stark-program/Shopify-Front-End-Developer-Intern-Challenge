@@ -1,6 +1,7 @@
 import type { NextPage } from 'next'
 import axios from 'axios'
 import { useState } from 'react'
+import { check } from 'prettier'
 
 /*FOR THIS CHALLENGE THE APP MUST CONTAIN
 1. A SIMPLE INPUT FORM
@@ -235,6 +236,14 @@ const Home: NextPage = () => {
     )
   }
 
+  function checkIfTrue(setAnswers:boolean, setCompletions: boolean, setEdits: boolean) {
+    setTextArea('')
+    setIsAnswers(setAnswers),
+    setIsCompletions(setCompletions),
+    setIsEdits(setEdits)
+    setChooseEngine(false)
+  }
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center py-2">
       <div className="max-w-xl">
@@ -299,29 +308,13 @@ const Home: NextPage = () => {
           onChange={(e) => {
             let value = e.target.value
             if (value === 'completion') {
-              setTextArea('')
-              setIsCompletions(true)
-              setIsAnswers(false)
-              setIsEdits(false)
-              setChooseEngine(false)
+              checkIfTrue(false,true,false)
             } else if (value === 'answer') {
-              setTextArea('')
-              setIsAnswers(true)
-              setIsCompletions(false)
-              setIsEdits(false)
-              setChooseEngine(false)
+              checkIfTrue(true,false,false)
             } else if (value === 'edits') {
-              setTextArea('')
-              setIsEdits(true)
-              setIsCompletions(false)
-              setIsAnswers(false)
-              setChooseEngine(false)
+              checkIfTrue(false,false,true)
             } else if (value === 'none') {
-              setTextArea('')
-              setIsEdits(false)
-              setIsAnswers(false)
-              setIsCompletions(false)
-              setChooseEngine(true)
+              checkIfTrue(false,false,false)
             }
           }}
         >

@@ -167,27 +167,18 @@ const Home: NextPage = () => {
       )
     })
   }
-  function renderAnswers() {
+
+  function renderCategory() {
     return (
       <div className="flex flex-col justify-center">
         <p className="mx-2 text-center">
-          {instructions.answerInstructions}
-          <br></br>
+          {' '}
+          {isCategory == 'answer' && instructions.answerInstructions}
+          {isCategory == 'completion' && instructions.completionInstructions}
+          {isCategory == 'edit' && instructions.editInstructions}
         </p>
-        {renderInput()}
-      </div>
-    )
-  }
-  function renderCompletion() {
-    return (
-      <p className="mx-2 text-center">{instructions.completionInstructions}</p>
-    )
-  }
-  function renderEdit() {
-    return (
-      <div className="flex flex-col justify-center">
-        <p className="mx-2 text-center">{instructions.editInstructions}</p>
-        {renderInput()}
+        {isCategory == 'answer' && renderInput()}
+        {isCategory == 'edit' && renderInput()}
       </div>
     )
   }
@@ -228,11 +219,7 @@ const Home: NextPage = () => {
           </select>
         </div>
 
-        <div>
-          {isCategory == 'answer' && renderAnswers()}
-          {isCategory == 'completion' && renderCompletion()}
-          {isCategory == 'edit' && renderEdit()}
-        </div>
+        <div>{renderCategory()}</div>
         <p className="text-center">
           This program utilizes technology provided by{' '}
           <span className="text-blue-600 underline">

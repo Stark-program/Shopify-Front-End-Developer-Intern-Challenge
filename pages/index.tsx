@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import axios from 'axios'
 import { useState } from 'react'
-import { check } from 'prettier'
+
 
 /*FOR THIS CHALLENGE THE APP MUST CONTAIN
 1. A SIMPLE INPUT FORM
@@ -12,13 +12,11 @@ import { check } from 'prettier'
 const Home: NextPage = () => {
   const [textArea, setTextArea] = useState('')
   const [chooseEngine, setChooseEngine] = useState(true)
-  const [isAnswers, setIsAnswers] = useState(false)
   const [isAnswersDocs, setIsAnswersDocs] = useState('')
-  const [isCompletions, setIsCompletions] = useState(false)
-  const [isEdits, setIsEdits] = useState(false)
   const [isEditsInstructions, setIsEditsInstructions] = useState('')
   const [responseReceived, setResponseReceived] = useState(false)
   const [response, setResponse] = useState<CompletionResponse[]>([])
+  const [isCategory, setIsCategory] = useState<string>("")
 
   interface CompletionResponse {
     prompt: String
@@ -236,11 +234,9 @@ const Home: NextPage = () => {
     )
   }
 
-  function checkIfTrue(setAnswers:boolean, setCompletions: boolean, setEdits: boolean) {
+  function checkIfTrue(value: string) {
     setTextArea('')
-    setIsAnswers(setAnswers),
-    setIsCompletions(setCompletions),
-    setIsEdits(setEdits)
+    setIsCategory(value)
     setChooseEngine(false)
   }
 
@@ -254,27 +250,19 @@ const Home: NextPage = () => {
           className="border-2 border-gray-400"
           onChange={(e) => {
             let value = e.target.value
-            if (value === 'completion') {
-              checkIfTrue(false,true,false)
-            } else if (value === 'answer') {
-              checkIfTrue(true,false,false)
-            } else if (value === 'edits') {
-              checkIfTrue(false,false,true)
-            } else if (value === 'none') {
-              checkIfTrue(false,false,false)
-            }
+            checkIfTrue(value)
           }}
         >
           <option value="none">---Choose Your Category---</option>
           <option value="completion">Completion</option>
           <option value="answer">Answer</option>
-          <option value="edits">Edit</option>
+          <option value="edit">Edit</option>
         </select>
       </div>
         <div>
-          {isAnswers && renderAnswers()}
-          {isCompletions && renderCompletion()}
-          {isEdits && renderEdit()}
+          {isCategory == "answer" && renderAnswers()}
+          {isCategory == "completion" && renderCompletion()}
+          {isCategory == "edit" && renderEdit()}
         </div>
       </div>
       <div className="flex flex-col justify-center">
@@ -283,17 +271,17 @@ const Home: NextPage = () => {
           onSubmit={(e: any) => {
             e.preventDefault()
             let value = e.target[0].value
-            switch (true) {
-              case isAnswers: {
+            switch (isCategory) {
+              case "answer": {
                 setIsAnswersDocs('')
                 setTextArea('')
                 return answers(value)
               }
-              case isCompletions: {
+              case "completion": {
                 setTextArea('')
                 return completions(value)
               }
-              case isEdits: {
+              case "edit": {
                 setIsEditsInstructions('')
                 setTextArea('')
                 return edits(value)

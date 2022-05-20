@@ -25,7 +25,7 @@ const Home: NextPage = () => {
     completionInstructions:
       '  In this field you are welcome to write any prompt you want and the bot will do its best to finish the statement!',
     answerInstructions:
-      'In this field you are welcome to ask any question. The first input field asks you to give the engine some data to answer the question, this is not a requirment, but an option (example: Puppy A is happy, Puppy B is sad. Question: Which puppy is happy?). If you do enter in some data please make sure to seperate them by commas. Please construct your question to pertain to this data.  ',
+      'In this field you are welcome to ask any question. The first input field asks you to give the engine some data to answer the question, this is not a requirment, but an option (example: Puppy A is happy, Puppy B is sad). If you do enter in some data please make sure to seperate them by commas. Please construct your question to pertain to this data.  ',
     editInstructions:
       '  In this field you are welcome to ask the AI to edit any piece of text you want. You will first give the AI some instructions on what to do with the text. (this is the smaller input field, example: edit the spelling) You will then input the text in the bigger area below.',
   }

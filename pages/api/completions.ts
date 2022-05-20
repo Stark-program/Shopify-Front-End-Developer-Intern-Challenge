@@ -28,6 +28,7 @@ export default async function handler(
       }
       res.send(configureRes)
     } catch (err) {
+      res.send(err)
       console.log(err)
     }
   }

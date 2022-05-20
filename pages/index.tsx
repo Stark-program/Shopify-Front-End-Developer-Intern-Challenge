@@ -2,7 +2,6 @@ import type { NextPage } from 'next'
 import axios from 'axios'
 import { useState } from 'react'
 
-
 /*FOR THIS CHALLENGE THE APP MUST CONTAIN
 1. A SIMPLE INPUT FORM
 2. SUBMITTING THE FORM SUBMITS THE PROMPT TO THE OPENAI
@@ -12,35 +11,45 @@ import { useState } from 'react'
 const Home: NextPage = () => {
   const [textArea, setTextArea] = useState('')
   const [chooseEngine, setChooseEngine] = useState(true)
-  const [isAnswers, setIsAnswers] = useState(false)
-  const [isAnswersDocs, setIsAnswersDocs] = useState('')
-  const [isCompletions, setIsCompletions] = useState(false)
-  const [isEdits, setIsEdits] = useState(false)
-  const [isEditsInstructions, setIsEditsInstructions] = useState('')
+  const [isInput, setIsInput] = useState('')
   const [responseReceived, setResponseReceived] = useState(false)
   const [response, setResponse] = useState<CompletionResponse[]>([])
+  const [isCategory, setIsCategory] = useState<string>('completion')
 
   interface CompletionResponse {
     prompt: String
     response: String
   }
+
+  let instructions = {
+    completionInstructions:
+      '  In this field you are welcome to write any prompt you want and the bot will do its best to finish the statement!',
+    answerInstructions:
+      'In this field you are welcome to ask any question. The first input field asks you to give the engine some data to answer the question, this is not a requirment, but an option (example: Puppy A is happy, Puppy B is sad. Question: Which puppy is happy?). If you do enter in some data please make sure to seperate them by commas. Please construct your question to pertain to this data.  ',
+    editInstructions:
+      '  In this field you are welcome to ask the AI to edit any piece of text you want. You will first give the AI some instructions on what to do with the text. (this is the smaller input field, example: edit the spelling) You will then input the text in the bigger area below.',
+  }
   //Completions API Endpoint
 
-  async function completions(value: string | number) {
-    let inputValue = value
-
+  async function completions() {
+    let inputValue = textArea
     let data = {
       prompt: inputValue,
     }
     try {
       const res = await axios.post('/api/completions', data)
-      let answer = {
-        endpoint: res.data.endpoint,
-        prompt: res.data.prompt,
-        response: res.data.response,
+      console.log(res)
+      if ('endpoint' in res.data) {
+        let answer = {
+          endpoint: res.data.endpoint,
+          prompt: res.data.prompt,
+          response: res.data.response,
+        }
+        setResponse((oldArray) => [...oldArray, answer])
+        setResponseReceived(true)
+      } else {
+        alert('Something went wrong')
       }
-      setResponse((oldArray) => [...oldArray, answer])
-      setResponseReceived(true)
     } catch (err) {
       console.log(err)
     }
@@ -48,22 +57,26 @@ const Home: NextPage = () => {
 
   //Answers API endpoint
 
-  async function answers(value: string | number) {
-    let inputValue = value
+  async function answers() {
+    let inputValue = textArea
     let data = {
-      documents: [isAnswersDocs],
+      documents: [isInput],
       question: inputValue,
     }
     try {
       const res = await axios.post('api/answers', data)
-      let answer = {
-        endpoint: res.data.endpoint,
-        input: res.data.input,
-        prompt: res.data.prompt,
-        response: res.data.response,
+      if ('endpoint' in res.data) {
+        let answer = {
+          endpoint: res.data.endpoint,
+          input: res.data.input,
+          prompt: res.data.prompt,
+          response: res.data.response,
+        }
+        setResponse((oldArray) => [...oldArray, answer])
+        setResponseReceived(true)
+      } else {
+        alert('Something went wrong')
       }
-      setResponse((oldArray) => [...oldArray, answer])
-      setResponseReceived(true)
     } catch (err) {
       console.log(err)
     }
@@ -71,29 +84,33 @@ const Home: NextPage = () => {
 
   //Edit API endpoint
 
-  async function edits(value: string | number) {
-    let inputValue = value
+  async function edits() {
+    let inputValue = textArea
     let data = {
       input: inputValue,
-      instruction: isEditsInstructions,
+      instruction: isInput,
     }
     try {
       const res = await axios.post('api/edits', data)
-      let answer = {
-        endpoint: res.data.endpoint,
-        input: res.data.input,
-        prompt: res.data.prompt,
-        response: res.data.response,
+      if ('endpoint' in res.data) {
+        let answer = {
+          endpoint: res.data.endpoint,
+          input: res.data.input,
+          prompt: res.data.prompt,
+          response: res.data.response,
+        }
+        setResponse((oldArray) => [...oldArray, answer])
+        setResponseReceived(true)
+      } else {
+        alert('Something went wrong')
       }
-      setResponse((oldArray) => [...oldArray, answer])
-      setResponseReceived(true)
     } catch (err) {
       console.log(err)
     }
   }
 
-  // Two of the endpoints have a different property because they require another text field. This is to check for that property and render accordingly. 
-  function checkProperty (obj: any) {
+  // Two of the endpoints have a different property because they require another text field. This is to check for that property and render accordingly.
+  function checkProperty(obj: any) {
     if (obj.hasOwnProperty('input')) {
       return (
         <>
@@ -103,16 +120,30 @@ const Home: NextPage = () => {
     }
   }
 
-  //All of the render functions. 
+  //All of the render functions.
 
-  function renderEngineChoice () {
+  function renderEngineChoice() {
     return (
       <div>
-        <h1>Please choose a category</h1>
+        <h1 className="text-center">
+          You are welcome to choose another category
+        </h1>
       </div>
     )
   }
-  function renderResponse () {
+  function renderInput() {
+    return (
+      <input
+        className="mx-2 h-10 border-2 border-gray-300"
+        value={isInput}
+        onChange={(e) => {
+          e.preventDefault()
+          setIsInput(e.target.value)
+        }}
+      ></input>
+    )
+  }
+  function renderResponse() {
     let reverseArr = [...response].reverse()
     return reverseArr.map((res: any) => {
       return (
@@ -140,91 +171,38 @@ const Home: NextPage = () => {
     return (
       <div className="flex flex-col justify-center">
         <p className="mx-2 text-center">
-          In this field you are welcome to ask any questions you
-          desire! The first input field asks you to give the engine
-          some data to answer the question. Please construct your
-          question to pertain to this data.
+          {instructions.answerInstructions}
           <br></br>
-          <br></br>This is an AI engineered bot that is programmed
-          to give you the best response catered to your question.
-          This is done utilizing GPT-3 created by{' '}
-          <span className="text-blue-600 underline">
-            <a href="https://openai.com/api/" target="_blank">
-              OpenAI
-            </a>
-          </span>
-          !
         </p>
-        <h2 className="mt-6 text-center">
-          Input your data below. Please seperate your entries by
-          commas or it will not work.
-        </h2>
-
-        <input
-          placeholder="example: Puppy A is happy, Puppy B is sad"
-          className="mx-2 h-10 border-2 border-gray-300"
-          value={isAnswersDocs}
-          onChange={(e) => {
-            e.preventDefault()
-            setIsAnswersDocs(e.target.value)
-          }}
-        ></input>
+        {renderInput()}
       </div>
     )
   }
   function renderCompletion() {
     return (
-      <p className="mx-2 text-center">
-        In this field you are welcome to write any prompt you want
-        and the bot will do its best to finish the statement! This
-        is an AI engineered bot that is programmed to give you the
-        best response catered to your input. This is done utilizing
-        GPT-3 created by{' '}
-        <span className="text-blue-600 underline">
-          <a href="https://openai.com/api/" target="_blank">
-            OpenAI
-          </a>
-        </span>
-        !
-      </p>
+      <p className="mx-2 text-center">{instructions.completionInstructions}</p>
     )
   }
   function renderEdit() {
     return (
       <div className="flex flex-col justify-center">
-        <p className="mx-2 text-center">
-          In this field you are welcome to ask the AI to edit any
-          piece of text you want. <br></br>
-          You will first give the AI some instructions on what to do
-          with the text. (this is the smaller input field) <br></br>
-          You will then input the text in the bigger area below.{' '}
-          <br></br>
-          This is an AI engineered bot that is programmed to give
-          you the best response catered to your input. This is done
-          utilizing GPT-3 created by{' '}
-          <span className="text-blue-600 underline">
-            <a href="https://openai.com/api/" target="_blank">
-              OpenAI
-            </a>
-          </span>
-          !
-        </p>
-        <h2 className="mt-6 text-center">
-          Input your instructions of what you would like done to
-          your text
-        </h2>
-
-        <input
-          placeholder="example: fix the spelling mistakes"
-          className="mx-2 h-10 border-2 border-gray-300"
-          value={isEditsInstructions}
-          onChange={(e) => {
-            e.preventDefault()
-            setIsEditsInstructions(e.target.value)
-          }}
-        ></input>
+        <p className="mx-2 text-center">{instructions.editInstructions}</p>
+        {renderInput()}
       </div>
     )
+  }
+
+  function checkIfTrue(value: string) {
+    setTextArea('')
+    setIsCategory(value)
+    setChooseEngine(false)
+  }
+  function onSubmit() {
+    setTextArea('')
+    setIsInput('')
+    if (isCategory == 'completion') return completions()
+    if (isCategory == 'answer') return answers()
+    if (isCategory == 'edit') return edits()
   }
 
   return (
@@ -232,36 +210,44 @@ const Home: NextPage = () => {
       <div className="max-w-xl">
         <h1 className="text-center text-[30px]">Fun With AI!</h1>
         {chooseEngine && renderEngineChoice()}
-        <div>
-          {isAnswers && renderAnswers()}
-          {isCompletions && renderCompletion()}
-          {isEdits && renderEdit()}
+
+        <div className="mt-4 flex justify-center">
+          <select
+            className="border-2 border-gray-400"
+            onChange={(e) => {
+              let value = e.target.value
+              checkIfTrue(value)
+            }}
+          >
+            <option value="none">---Choose Your Category---</option>
+            <option value="completion" selected>
+              Completion
+            </option>
+            <option value="answer">Answer</option>
+            <option value="edit">Edit</option>
+          </select>
         </div>
+
+        <div>
+          {isCategory == 'answer' && renderAnswers()}
+          {isCategory == 'completion' && renderCompletion()}
+          {isCategory == 'edit' && renderEdit()}
+        </div>
+        <p className="text-center">
+          This program utilizes technology provided by{' '}
+          <span className="text-blue-600 underline">
+            <a href="https://openai.com/api/" target="_blank">
+              OpenAI
+            </a>
+          </span>
+        </p>
       </div>
       <div className="flex flex-col justify-center">
         <form
           className="mx-4 mt-10 flex flex-col justify-center"
-          onSubmit={(e: any) => {
+          onSubmit={(e) => {
             e.preventDefault()
-            let value = e.target[0].value
-            switch (true) {
-              case isAnswers: {
-                setIsAnswersDocs('')
-                setTextArea('')
-                return answers(value)
-              }
-              case isCompletions: {
-                setTextArea("")
-                return completions(value)
-              }
-              case isEdits: {
-                setIsEditsInstructions("")
-                setTextArea("")
-                return edits(value)
-              }
-              default:
-                return null
-            }
+            onSubmit()
           }}
         >
           <label className="flex justify-center" htmlFor="userInput">
@@ -285,44 +271,7 @@ const Home: NextPage = () => {
           </button>
         </form>
       </div>
-      <div className="mt-4 flex">
-        <select
-          className="border-2 border-gray-400"
-          onChange={(e) => {
-            let value = e.target.value
-            if (value === 'completion') {
-              setTextArea('')
-              setIsCompletions(true)
-              setIsAnswers(false)
-              setIsEdits(false)
-              setChooseEngine(false)
-            } else if (value === 'answer') {
-              setTextArea('')
-              setIsAnswers(true)
-              setIsCompletions(false)
-              setIsEdits(false)
-              setChooseEngine(false)
-            } else if (value === 'edits') {
-              setTextArea('')
-              setIsEdits(true)
-              setIsCompletions(false)
-              setIsAnswers(false)
-              setChooseEngine(false)
-            } else if (value === 'none') {
-              setTextArea('')
-              setIsEdits(false)
-              setIsAnswers(false)
-              setIsCompletions(false)
-              setChooseEngine(true)
-            }
-          }}
-        >
-          <option value="none">---Choose Your Category---</option>
-          <option value="completion">Completion</option>
-          <option value="answer">Answer</option>
-          <option value="edits">Edit</option>
-        </select>
-      </div>
+
       <div>
         <h1 className="bold mt-4 text-[20px]">RESPONSES</h1>
       </div>
